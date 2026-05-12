@@ -7,7 +7,6 @@ class TrabajosRepository {
     return _col
         .where('operarioId', isEqualTo: uid)
         .where('estado', whereIn: ['asignado', 'en_camino', 'en_sitio', 'retrasado'])
-        .orderBy('creadoEn', descending: true)
         .snapshots();
   }
 
@@ -15,8 +14,7 @@ class TrabajosRepository {
     return _col
         .where('operarioId', isEqualTo: uid)
         .where('estado', whereIn: ['revision_cliente', 'reporte_aprobado', 'completado', 'evaluado_cliente', 'cerrado'])
-        .orderBy('creadoEn', descending: true)
-        .limit(5)
+        .limit(20)
         .snapshots();
   }
 

@@ -152,7 +152,7 @@ class _ReporteTecnicoScreenState extends State<ReporteTecnicoScreen> {
                     const Text('TIPO DE INTERVENCIÓN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: _tipoServicio,
+                      initialValue: _tipoServicio,
                       decoration: const InputDecoration(hintText: 'Seleccione el servicio ejecutado'),
                       items: _tipos.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                       onChanged: (v) => setState(() => _tipoServicio = v),

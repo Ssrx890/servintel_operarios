@@ -125,7 +125,7 @@ class _ClienteScreenState extends State<ClienteScreen> {
                     const Text('ÁREA TÉCNICA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: _categoriaSel,
+                      initialValue: _categoriaSel,
                       decoration: const InputDecoration(hintText: 'Seleccione el servicio...'),
                       items: kCategorias.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                       onChanged: (v) => setState(() => _categoriaSel = v),
@@ -169,7 +169,7 @@ class _ClienteScreenState extends State<ClienteScreen> {
             StreamBuilder<QuerySnapshot>(
               stream: _historialStream,
               builder: (context, snapshot) {
-                if (snapshot.hasError) return Center(child: Text('Error al cargar datos: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                if (snapshot.hasError) return const SizedBox();
                 if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
                 if (snapshot.data!.docs.isEmpty) {
                   return const Center(
