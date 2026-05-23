@@ -95,7 +95,7 @@ class _ReporteTecnicoScreenState extends State<ReporteTecnicoScreen> {
         'equipos': _equipos.map((e) => {'equipoMarca': e['equipoMarca']!.text.trim(), 'modelo': e['modelo']!.text.trim(), 'contador': e['contador']!.text.trim()}).toList(),
         'detallesTecnicos': _detalles.map((d) => {'diagnostico': d['diagnostico']!.text.trim(), 'solucion': d['solucion']!.text.trim()}).toList(),
         'insumos': _insumos.map((i) => {'descripcion': i['descripcion']!.text.trim(), 'cantidad': i['cantidad']!.text.trim()}).toList(),
-        'costoServicio': double.tryParse(_costoServicioCtrl.text.trim()) ?? 0.0,
+        'costoEmpresa': double.tryParse(_costoServicioCtrl.text.trim()) ?? 0.0,
         'costoTecnico': double.tryParse(_costoTecnicoCtrl.text.trim()) ?? 0.0,
         'fechaEmision': FieldValue.serverTimestamp(),
       };
@@ -103,7 +103,6 @@ class _ReporteTecnicoScreenState extends State<ReporteTecnicoScreen> {
       await FirebaseFirestore.instance.collection('trabajos').doc(widget.jobId).update({
         'estado': 'revision_cliente',
         'reporteTecnico': reporte,
-        'tiempoCompletado': FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
@@ -152,7 +151,7 @@ class _ReporteTecnicoScreenState extends State<ReporteTecnicoScreen> {
                     const Text('TIPO DE INTERVENCIÓN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: _tipoServicio,
+                      initialValue: _tipoServicio,
                       decoration: const InputDecoration(hintText: 'Seleccione el servicio ejecutado'),
                       items: _tipos.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                       onChanged: (v) => setState(() => _tipoServicio = v),
@@ -196,7 +195,7 @@ class _ReporteTecnicoScreenState extends State<ReporteTecnicoScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _costoServicioCtrl,
-                            decoration: const InputDecoration(labelText: 'Costo Empresa (\$)', hintText: '0'),
+                            decoration: const InputDecoration(labelText: 'Costo Empresa (\$)', hintText: '0'), // guardado como costoEmpresa
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
