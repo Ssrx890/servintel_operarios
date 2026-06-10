@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Trabajo {
   final String id;
   final String categoria;
+  final List<String> servicios;
   final String clienteNombre;
   final String descripcion;
   final String? estado;
@@ -17,6 +18,7 @@ class Trabajo {
   const Trabajo({
     required this.id,
     required this.categoria,
+    required this.servicios,
     required this.clienteNombre,
     required this.descripcion,
     this.estado,
@@ -31,9 +33,14 @@ class Trabajo {
 
   factory Trabajo.fromDoc(QueryDocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    final rawServicios = data['servicios'];
+    final List<String> serviciosList = rawServicios is List
+        ? List<String>.from(rawServicios)
+        : (data['categoria'] != null ? [data['categoria'] as String] : ['General']);
     return Trabajo(
       id: doc.id,
       categoria: data['categoria'] ?? '',
+      servicios: serviciosList,
       clienteNombre: data['clienteNombre'] ?? '',
       descripcion: data['descripcion'] ?? '',
       estado: data['estado'] as String?,
@@ -49,6 +56,7 @@ class Trabajo {
 
   Map<String, dynamic> toMap() => {
         'categoria': categoria,
+        'servicios': servicios,
         'clienteNombre': clienteNombre,
         'descripcion': descripcion,
         'estado': estado,

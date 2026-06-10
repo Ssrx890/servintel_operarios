@@ -9,13 +9,13 @@ import '../../core/constants.dart';
 
 class MapaClienteScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
-  final String categoria;
+  final List<String> servicios;
   final String descripcion;
 
   const MapaClienteScreen({
     super.key,
     required this.userData,
-    required this.categoria,
+    required this.servicios,
     required this.descripcion,
   });
 
@@ -100,11 +100,13 @@ class _MapaClienteScreenState extends State<MapaClienteScreen> {
 
       // Generate cryptographically secure 4-digit PIN
       final pinCode = (Random.secure().nextInt(9000) + 1000).toString();
+      final categoriaDisplay = widget.servicios.join(' + ');
 
       await FirebaseFirestore.instance.collection('trabajos').add({
         'clienteId': uid,
         'clienteNombre': widget.userData['nombre'] ?? 'Cliente',
-        'categoria': widget.categoria,
+        'categoria': categoriaDisplay,
+        'servicios': widget.servicios,
         'descripcion': widget.descripcion,
         'direccionText': _direccionCtrl.text.trim(),
         'lat': _selectedLocation!.latitude,

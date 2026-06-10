@@ -28,7 +28,10 @@ class _AuthGateState extends State<AuthGate> {
         if (_cachedUser != null) {
           // Si se deslogueó explícitamente (data = null, sin error), limpiar caché
           if (!snapshot.hasError && snapshot.connectionState == ConnectionState.active && snapshot.data == null) {
-            _cachedUser = null;
+            // BUG-07 fix: no modificar estado directamente en build(); usar callback post-frame
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _cachedUser = null);
+            });
             return const LoginScreen();
           }
           return RoleRouter(uid: _cachedUser!.uid);

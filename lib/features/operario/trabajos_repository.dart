@@ -8,7 +8,6 @@ class TrabajosRepository {
   static Stream<QuerySnapshot> streamActiveForOperario(String uid) {
     return _col
         .where('operarioId', isEqualTo: uid)
-        .where('estado', whereIn: ['asignado', 'en_camino', 'en_sitio', 'retrasado'])
         .where(
           'estado',
           whereIn: [
@@ -29,12 +28,10 @@ class TrabajosRepository {
   static Stream<QuerySnapshot> streamCompletedRecentForOperario(String uid) {
     return _col
         .where('operarioId', isEqualTo: uid)
-        .where('estado', whereIn: ['revision_cliente', 'reporte_aprobado', 'completado', 'evaluado_cliente', 'cerrado'])
-        .limit(20)
         .where(
           'estado',
           whereIn: [
-            'revision_cliente',
+            // 'revision_cliente' removido: ya aparece en streamActiveForOperario
             'reporte_aprobado',
             'completado',
             'evaluado_cliente',

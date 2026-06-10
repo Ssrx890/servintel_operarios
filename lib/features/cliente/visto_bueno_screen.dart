@@ -17,11 +17,8 @@ class VistoBuenoScreen extends StatefulWidget {
 class _VistoBuenoScreenState extends State<VistoBuenoScreen> {
   bool _isApproving = false;
 
-  final _commentCtrl = TextEditingController();
-
   @override
   void dispose() {
-    _commentCtrl.dispose();
     super.dispose();
   }
 
@@ -61,9 +58,10 @@ class _VistoBuenoScreenState extends State<VistoBuenoScreen> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     final reporte = widget.data['reporteTecnico'] ?? {};
+    final List<dynamic> listaAlquileres = reporte['alquileres'] ?? (reporte['contratoAlquiler'] != null ? [reporte['contratoAlquiler']] : []);
+    final List<dynamic> listaVentas = reporte['ventas'] ?? (reporte['detalleVenta'] != null ? [reporte['detalleVenta']] : []);
     
     return Scaffold(
       appBar: const BrandedAppBar(),
@@ -151,6 +149,70 @@ class _VistoBuenoScreenState extends State<VistoBuenoScreen> {
                   if (reporte['costoTecnico'] != null && reporte['costoTecnico'].toString().isNotEmpty)
                     _buildRow('Servicio Técnico', '\$${reporte['costoTecnico']}', isBold: true),
                 ],
+              ),
+            // ── Sección Alquiler ───────────────────────────────────────────
+            if (listaAlquileres.isNotEmpty)
+              _buildSection(
+                'CONTRATOS DE ALQUILER',
+                listaAlquileres.map((alq) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildRow('Equipo', (alq['marcaModelo'] ?? '') as String),
+                        _buildRow('Serial', (alq['serial'] ?? '') as String),
+                        if ((alq['contadorInicial'] ?? '').toString().isNotEmpty)
+                          _buildRow('Contador inicial', alq['contadorInicial'].toString()),
+                        if (alq['valorMensual'] != null && alq['valorMensual'] != 0)
+                          _buildRow('Valor mensual', '\$${alq['valorMensual']}', isBold: true),
+                        if (alq['copiasIncluidas'] != null && alq['copiasIncluidas'] != 0)
+                          _buildRow('Copias incl./mes', alq['copiasIncluidas'].toString()),
+                        if (alq['valorCopiaExtra'] != null && alq['valorCopiaExtra'] != 0)
+                          _buildRow('Copia extra', '\$${alq['valorCopiaExtra']}'),
+                        if ((alq['fechaInicio'] ?? '').toString().isNotEmpty)
+                          _buildRow('Inicio', (alq['fechaInicio'] ?? '') as String),
+                        if (alq['duracionMeses'] != null && alq['duracionMeses'] != 0)
+                          _buildRow('Duración', '${alq['duracionMeses']} meses'),
+                        if ((alq['observaciones'] ?? '').toString().isNotEmpty)
+                          _buildRow('Observaciones', (alq['observaciones'] ?? '') as String),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            // ── Sección Venta ──────────────────────────────────────────────
+            if (listaVentas.isNotEmpty)
+              _buildSection(
+                'DETALLES DE VENTA',
+                listaVentas.map((vnt) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildRow('Equipo', (vnt['marcaModelo'] ?? '') as String),
+                        _buildRow('Serial', (vnt['serial'] ?? '') as String),
+                        _buildRow('Estado', (vnt['estado'] ?? '') as String),
+                        if (vnt['precio'] != null && vnt['precio'] != 0)
+                          _buildRow('Precio', '\$${vnt['precio']}', isBold: true),
+                        _buildRow('Forma de pago', (vnt['formaPago'] ?? '') as String),
+                        if ((vnt['garantia'] ?? '').toString().isNotEmpty)
+                          _buildRow('Garantía', (vnt['garantia'] ?? '') as String),
+                        if ((vnt['accesorios'] ?? '').toString().isNotEmpty)
+                          _buildRow('Accesorios', (vnt['accesorios'] ?? '') as String),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
             if (!widget.isReadOnly) ...[
               Row(

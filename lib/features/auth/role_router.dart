@@ -42,9 +42,10 @@ class _RoleRouterState extends State<RoleRouter> {
 
         // Sin caché + error de conexión
         if (snapshot.hasError) {
-          final msg = snapshot.error.toString().contains('PERMISSION_DENIED')
+          final errStr = snapshot.error.toString();
+          final msg = errStr.contains('PERMISSION_DENIED')
               ? 'Sin permisos de acceso. Contacte al administrador.'
-              : 'Verifica tu conexión a internet e intenta de nuevo.';
+              : 'Error: $errStr';
           return Scaffold(
             body: Center(
               child: Padding(

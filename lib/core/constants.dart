@@ -21,6 +21,8 @@ const List<String> kCategorias = [
   'Soporte Técnico',
   'Impresora / Fotocopiadora',
   'Reparaciones Generales',
+  'Alquiler de Máquina',
+  'Venta de Máquina',
 ];
 
 // Helper global para color de estado
@@ -36,6 +38,10 @@ Color getColorEstado(String estado) {
       return Colors.red;
     case 'en_sitio':
       return Colors.teal;
+    case 'trabajo_aprobado':
+      return Colors.indigo;
+    case 'en_progreso':
+      return Colors.green;
     case 'revision_cliente':
       return Colors.deepPurple;
     case 'esperando_cierre':

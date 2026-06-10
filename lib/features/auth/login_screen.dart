@@ -35,10 +35,14 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      _showSnackbar(_mapAuthError(e.code), Colors.red);
+      if (e.code == 'network-request-failed') {
+        _showSnackbar('Sin conexión a internet.', Colors.red);
+      } else {
+        _showSnackbar(_mapAuthError(e.code), Colors.red);
+      }
     } catch (e) {
       if (!mounted) return;
-      _showSnackbar('Error de conexión. Intente de nuevo.', Colors.red);
+      _showSnackbar('Error: ${e.toString()}', Colors.red);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

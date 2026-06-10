@@ -18,7 +18,7 @@ class ClienteScreen extends StatefulWidget {
 class _ClienteScreenState extends State<ClienteScreen> {
   final _descCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String? _categoriaSel;
+  final Set<String> _serviciosSel = {};
   late Stream<QuerySnapshot> _historialStream;
 
   @override
@@ -39,9 +39,15 @@ class _ClienteScreenState extends State<ClienteScreen> {
   }
 
   Future<void> _enviarSolicitud() async {
+    if (_serviciosSel.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Seleccione al menos un tipo de servicio'), backgroundColor: Colors.red),
+      );
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
 
-    final categoria = _categoriaSel!;
+    final servicios = _serviciosSel.toList();
     final desc = _descCtrl.text.trim();
 
     final result = await Navigator.push(
@@ -49,7 +55,7 @@ class _ClienteScreenState extends State<ClienteScreen> {
       MaterialPageRoute(
         builder: (_) => MapaClienteScreen(
           userData: widget.userData,
-          categoria: categoria,
+          servicios: servicios,
           descripcion: desc,
         ),
       ),
@@ -57,7 +63,7 @@ class _ClienteScreenState extends State<ClienteScreen> {
 
     if (result == true) {
       _descCtrl.clear();
-      setState(() => _categoriaSel = null);
+      setState(() => _serviciosSel.clear());
     }
   }
 
@@ -113,81 +119,62 @@ class _ClienteScreenState extends State<ClienteScreen> {
                   children: [
                     const Row(
                       children: [
-                        Icon(
-                          Icons.headset_mic_rounded,
-                          color: cFucsia,
-                          size: 20,
-                        ),
+                        Icon(Icons.headset_mic_rounded, color: cFucsia, size: 20),
                         SizedBox(width: 10),
-                        Text(
-                          'SOLICITAR INTERVENCIÓN',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: cTextoOscuro,
-                          ),
-                        ),
+                        Text('SOLICITAR INTERVENCIÓN', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: cTextoOscuro)),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'ÁREA TÉCNICA',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      initialValue: _categoriaSel,
-                      decoration: const InputDecoration(
-                        hintText: 'Seleccione el servicio...',
-                      ),
-                      items: kCategorias
-                          .map(
-                            (c) => DropdownMenuItem(value: c, child: Text(c)),
-                          )
-                          .toList(),
-                      onChanged: (v) => setState(() => _categoriaSel = v),
-                      validator: (v) =>
-                          v == null ? 'Seleccione una categoría' : null,
+                    const SizedBox(height: 20),
+                    const Text('TIPO DE SERVICIO (puede seleccionar varios)',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: kCategorias.map((cat) {
+                        final selected = _serviciosSel.contains(cat);
+                        IconData ico = Icons.build_rounded;
+                        if (cat.contains('Soporte')) { ico = Icons.headset_mic_rounded; }
+                        else if (cat.contains('Impresora') || cat.contains('Fotocopiadora')) { ico = Icons.print_rounded; }
+                        else if (cat.contains('Alquiler')) { ico = Icons.description_rounded; }
+                        else if (cat.contains('Venta')) { ico = Icons.sell_rounded; }
+                        else if (cat.contains('Reparacion') || cat.contains('Reparación')) { ico = Icons.handyman_rounded; }
+                        return FilterChip(
+                          avatar: Icon(ico, size: 16, color: selected ? Colors.white : cAzul),
+                          label: Text(cat, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? Colors.white : cTextoOscuro)),
+                          selected: selected,
+                          onSelected: (v) => setState(() {
+                            if (v) { _serviciosSel.add(cat); }
+                            else { _serviciosSel.remove(cat); }
+                          }),
+                          selectedColor: cAzul,
+                          backgroundColor: cAzul.withValues(alpha: 0.07),
+                          checkmarkColor: Colors.white,
+                          side: BorderSide(color: selected ? cAzul : cAzul.withValues(alpha: 0.3)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'DIAGNÓSTICO INICIAL',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    const Text('DIAGNÓSTICO / DESCRIPCIÓN',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _descCtrl,
                       maxLines: 4,
                       decoration: const InputDecoration(
-                        hintText:
-                            'Describa el problema lo más detallado posible...',
+                        hintText: 'Describa el problema lo más detallado posible...',
                       ),
-                      validator: (v) => (v == null || v.trim().length < 10)
-                          ? 'Detalle más el problema'
-                          : null,
+                      validator: (v) => (v == null || v.trim().length < 10) ? 'Detalle más el problema' : null,
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: cFucsia,
-                          foregroundColor: Colors.white,
-                        ),
+                        style: ElevatedButton.styleFrom(backgroundColor: cFucsia, foregroundColor: Colors.white),
                         onPressed: _enviarSolicitud,
                         icon: const Icon(Icons.location_searching_rounded),
-                        label: const Text(
-                          'CONTINUAR A UBICACIÓN',
-                          style: TextStyle(fontWeight: FontWeight.w900),
-                        ),
+                        label: const Text('CONTINUAR A UBICACIÓN', style: TextStyle(fontWeight: FontWeight.w900)),
                       ),
                     ),
                   ],
@@ -281,7 +268,13 @@ class _ClienteScreenState extends State<ClienteScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            data['categoria'] ?? 'General',
+                            (() {
+                              final rawServicios = data['servicios'];
+                              if (rawServicios is List && rawServicios.isNotEmpty) {
+                                return rawServicios.join(' · ');
+                              }
+                              return data['categoria'] ?? 'General';
+                            })(),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
